@@ -1,0 +1,19 @@
+# Analyzer + formatter for the Capecho mobile app. Kept in sync with clients/macos and
+# shared/app-core. `dart format` and CI read page_width from here.
+include: package:flutter_lints/flutter.yaml
+
+formatter:
+  page_width: 100
+
+linter:
+  rules:
+    # Beyond flutter_lints — conventions the codebase already mostly follows, kept enforced.
+    - prefer_single_quotes
+    - directives_ordering
+    - prefer_const_constructors
+    - prefer_const_constructors_in_immutables
+    - prefer_const_literals_to_create_immutables
+    - prefer_const_declarations
+    - use_super_parameters
+    - unnecessary_parenthesis
+    - unawaited_futures

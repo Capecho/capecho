@@ -1,0 +1,48 @@
+{
+  "schemaVersion": 1,
+  "snapshotId": "snap-fixture-1",
+  "builtAt": 1733616000000,
+  "staleAfterMs": 86400000,
+  "cursor": 0,
+  "cards": [
+    {
+      "wordId": "w-ledger",
+      "surfaceUnit": "ledger",
+      "targetLang": "en",
+      "dueAt": 1733620000000,
+      "state": "due",
+      "contextText": "She kept a ledger of debts.",
+      "targetSpan": [11, 17],
+      "ipa": "ˈlɛdʒər",
+      "meaning": "账簿;分类账",
+      "meaningStatus": "ready",
+      "contextMeaning": "这里 ledger 指记账的账本;这句话说她把欠的债都记在账本里。"
+    },
+    {
+      "wordId": "w-framework",
+      "surfaceUnit": "framework",
+      "targetLang": "de",
+      "dueAt": 1733620000001,
+      "state": "due",
+      "contextText": "学习 framework 的用法",
+      "targetSpan": [3, 12],
+      "ipa": null,
+      "meaning": null,
+      "meaningStatus": "unsupported",
+      "contextMeaning": null
+    },
+    {
+      "wordId": "w-bare",
+      "surfaceUnit": "obscure",
+      "targetLang": "en",
+      "dueAt": 1733620000002,
+      "state": "due",
+      "contextText": "",
+      "targetSpan": null,
+      "ipa": null,
+      "meaning": null,
+      "meaningStatus": "unavailable",
+      "contextMeaning": null
+    }
+  ]
+}

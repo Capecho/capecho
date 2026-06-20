@@ -1,0 +1,254 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+@import "./marketing.css";
+
+/* next-themes drives a `.dark` class on <html>; make Tailwind's dark variant
+   follow it instead of the OS media query. */
+@custom-variant dark (&:is(.dark *));
+
+/* ============================================================================
+   Capecho — App "Caffeine" palette (DESIGN.md §Color + design/.../tokens.css)
+   The marketing site wears the warm-library APP system (coffee-brown primary,
+   latte chips, dark-roast ink, espresso dark mode). The warm-glass OVERLAY is a
+   product motif, surfaced only in capture mockups. Values are verbatim from
+   DESIGN.md — do NOT invent colors.
+   ============================================================================ */
+:root {
+  /* --- Caffeine (light) --- */
+  --app-canvas: #f6f3ef;
+  --app-card: #ffffff;
+  --app-titlebar: #efeae3;
+  --app-ink: #2b2320;
+  --app-ink-2: #6b5d54;
+  --app-ink-3: #a2958a;
+  --app-line: #ece5dc;
+  --app-primary: #644a40;
+  --app-primary-fg: #ffffff;
+  --app-chip: #ffdfb5;
+  --app-chip-fg: #582d1d;
+  --app-primary-soft: rgba(100, 74, 64, 0.13);
+
+  /* --- Warm-glass overlay accent (used in product mockups) --- */
+  --ovl-tint: rgba(246, 242, 236, 0.72);
+  --ovl-edge: rgba(255, 251, 245, 0.58);
+  --ovl-ink: #241c17;
+  --ovl-ink-2: #6a5b50;
+  --ovl-rule: rgba(62, 45, 34, 0.34);
+  --ovl-accent: #644a40;
+
+  /* --- Semantic (muted to match coffee; both modes) --- */
+  --success: #5a6a48;
+  --warning: #a8741e;
+  --error: #8a2a1e;
+  --info: #4a5a6a;
+
+  /* --- Double-edge "stacked paper" shadow system --- */
+  --app-edge: #2b2320;
+  --shadow-edge: 3px 3px 0 var(--app-edge);
+  --shadow-edge-sm: 2px 2px 0 var(--app-edge);
+  --shadow-edge-press: 1px 1px 0 var(--app-edge);
+  --shadow-edge-soft: 4px 5px 0 rgba(43, 35, 32, 0.13);
+  --shadow-edge-soft-hover: 5px 7px 0 rgba(43, 35, 32, 0.16);
+  --shadow-edge-lift: 5px 5px 0 var(--app-edge);
+  --window-ambient: 0 30px 70px rgba(40, 25, 15, 0.3);
+
+  /* Soft button elevation (marketing CTAs) — a warm, low drop shadow that lifts
+     on hover and sinks on press, replacing the hard stacked-paper offset that
+     read as sticker-like against the editorial type (web/DESIGN.md §8). These
+     flip light/dark, so they feed the registered shadow-btn* utilities below. */
+  --btn-shadow: 0 1px 2px rgba(43, 35, 32, 0.16), 0 3px 8px -1px rgba(43, 35, 32, 0.14);
+  --btn-shadow-hover: 0 2px 4px rgba(43, 35, 32, 0.18),
+    0 8px 20px -3px rgba(43, 35, 32, 0.2);
+  --btn-shadow-press: 0 1px 2px rgba(43, 35, 32, 0.16);
+
+  /* App card radius — DESIGN.md tokens.css foundation decision: 11px. */
+  --radius: 11px;
+
+  /* --- shadcn semantic tokens → mapped onto Caffeine (light) --- */
+  --background: var(--app-canvas);
+  --foreground: var(--app-ink);
+  --card: var(--app-card);
+  --card-foreground: var(--app-ink);
+  --popover: var(--app-card);
+  --popover-foreground: var(--app-ink);
+  --primary: var(--app-primary);
+  --primary-foreground: var(--app-primary-fg);
+  --secondary: var(--app-titlebar);
+  --secondary-foreground: var(--app-ink);
+  --muted: var(--app-titlebar);
+  --muted-foreground: var(--app-ink-3);
+  --accent: var(--app-primary-soft);
+  --accent-foreground: var(--app-ink);
+  --destructive: var(--error);
+  --destructive-foreground: #ffffff;
+  --border: var(--app-line);
+  --input: var(--app-line);
+  --ring: var(--app-primary);
+}
+
+.dark {
+  /* --- Caffeine Espresso (dark) --- */
+  --app-canvas: #221b17;
+  --app-card: #2c241f;
+  --app-titlebar: #1c1611;
+  --app-ink: #f0e9e0;
+  --app-ink-2: #c3b4a6;
+  --app-ink-3: #8d7e71;
+  --app-line: #3a302a;
+  --app-primary: #e6c49b;
+  --app-primary-fg: #2b1f18;
+  --app-chip: rgba(230, 196, 155, 0.16);
+  --app-chip-fg: #e6c49b;
+  --app-primary-soft: rgba(230, 196, 155, 0.18);
+
+  --ovl-tint: rgba(34, 26, 21, 0.7);
+  --ovl-edge: rgba(255, 248, 240, 0.16);
+  --ovl-ink: #f1eae0;
+  --ovl-ink-2: #c4b5a7;
+  --ovl-rule: rgba(240, 233, 224, 0.4);
+  --ovl-accent: #e6c49b;
+
+  --app-edge: #100c0a;
+  --shadow-edge: 3px 3px 0 var(--app-edge);
+  --shadow-edge-sm: 2px 2px 0 var(--app-edge);
+  --shadow-edge-press: 1px 1px 0 var(--app-edge);
+  --shadow-edge-soft: 4px 5px 0 rgba(43, 35, 32, 0.13);
+  --shadow-edge-soft-hover: 5px 7px 0 rgba(43, 35, 32, 0.16);
+  --shadow-edge-lift: 5px 5px 0 var(--app-edge);
+
+  /* Espresso: black-based so the soft elevation still reads on dark surfaces. */
+  --btn-shadow: 0 1px 2px rgba(0, 0, 0, 0.5), 0 3px 10px -1px rgba(0, 0, 0, 0.42);
+  --btn-shadow-hover: 0 2px 5px rgba(0, 0, 0, 0.55),
+    0 10px 24px -3px rgba(0, 0, 0, 0.5);
+  --btn-shadow-press: 0 1px 2px rgba(0, 0, 0, 0.5);
+
+  --background: var(--app-canvas);
+  --foreground: var(--app-ink);
+  --card: var(--app-card);
+  --card-foreground: var(--app-ink);
+  --popover: var(--app-card);
+  --popover-foreground: var(--app-ink);
+  --primary: var(--app-primary);
+  --primary-foreground: var(--app-primary-fg);
+  --secondary: var(--app-titlebar);
+  --secondary-foreground: var(--app-ink);
+  --muted: var(--app-titlebar);
+  --muted-foreground: var(--app-ink-3);
+  --accent: var(--app-primary-soft);
+  --accent-foreground: var(--app-ink);
+  --destructive: var(--error);
+  --destructive-foreground: #ffffff;
+  --border: var(--app-line);
+  --input: var(--app-line);
+  --ring: var(--app-primary);
+}
+
+/* ----------------------------------------------------------------------------
+   Tailwind theme bindings — expose tokens as utilities (bg-*, text-*, font-*,
+   rounded-*, shadow-*).
+   ---------------------------------------------------------------------------- */
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+
+  --color-chip: var(--app-chip);
+  --color-chip-foreground: var(--app-chip-fg);
+  --color-ink: var(--app-ink);
+  --color-ink-2: var(--app-ink-2);
+  --color-ink-3: var(--app-ink-3);
+  --color-canvas: var(--app-canvas);
+  --color-titlebar: var(--app-titlebar);
+  --color-success: var(--success);
+  --color-warning: var(--warning);
+  --color-error: var(--error);
+  --color-info: var(--info);
+
+  --font-display: var(--font-fraunces), Georgia, "Times New Roman", serif;
+  --font-logo: var(--font-fraunces), Georgia, "Times New Roman", serif;
+  --font-serif: "Charter", var(--font-source-serif), Georgia, serif;
+  --font-sans: -apple-system, system-ui, "Segoe UI", Roboto, "Helvetica Neue",
+    Arial, sans-serif;
+  --font-mono: var(--font-jetbrains), ui-monospace, "SFMono-Regular", Menlo,
+    monospace;
+
+  /* Register the stacked-paper edge shadows as Tailwind utilities (shadow-edge,
+     shadow-edge-sm, shadow-edge-press, shadow-edge-soft, shadow-edge-soft-hover,
+     shadow-edge-lift). They reference --app-edge, which flips light/dark.
+     shadow-edge-lift is the solid hover ledge (3px → 5px) — the button stays a
+     crisp dark edge on hover, never a soft/translucent wash. */
+  --shadow-edge: 3px 3px 0 var(--app-edge);
+  --shadow-edge-sm: 2px 2px 0 var(--app-edge);
+  --shadow-edge-press: 1px 1px 0 var(--app-edge);
+  --shadow-edge-soft: 4px 5px 0 rgba(43, 35, 32, 0.13);
+  --shadow-edge-soft-hover: 5px 7px 0 rgba(43, 35, 32, 0.16);
+  --shadow-edge-lift: 5px 5px 0 var(--app-edge);
+
+  /* Soft button elevation — registered so hover/active variants generate; the
+     value rides --btn-shadow*, which flips light/dark (see :root / .dark). */
+  --shadow-btn: var(--btn-shadow);
+  --shadow-btn-hover: var(--btn-shadow-hover);
+  --shadow-btn-press: var(--btn-shadow-press);
+
+  --radius-sm: calc(var(--radius) - 3px);
+  --radius-md: calc(var(--radius) - 1px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 6px);
+}
+
+@layer base {
+  * {
+    border-color: var(--border);
+  }
+  body {
+    background-color: var(--background);
+    color: var(--foreground);
+    font-family: var(--font-serif);
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+  /* Display headings — Fraunces (shared with the app + the wordmark), editorial
+     optical size. Unified to one display serif so the web reads as the same
+     product as the app (web/DESIGN.md §3). */
+  h1, h2, h3, .font-display {
+    font-family: var(--font-display);
+    font-variation-settings: "opsz" 72;
+    letter-spacing: -0.018em;
+  }
+  /* Brand logotype + the app UI shown inside device scenes stay Fraunces. */
+  .font-logo {
+    font-family: var(--font-logo);
+    font-variation-settings: "opsz" 72;
+    letter-spacing: -0.02em;
+  }
+  ::selection {
+    background-color: var(--app-primary);
+    color: var(--app-primary-fg);
+  }
+}
+
+/* Respect reduced-motion: the press/transition stays instant (DESIGN.md). */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}

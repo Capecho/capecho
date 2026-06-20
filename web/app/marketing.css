@@ -1,0 +1,535 @@
+/* ============================================================================
+   Capecho marketing redesign — bespoke pixel-art + scroll-reveal.
+   Tokens, layout rhythm, ledgers, rails etc. are done with Tailwind utilities in
+   the components; THIS file holds only the things Tailwind can't express well:
+   the device scene (MacBook + iPhone), the warm-glass capture overlay, and the
+   scroll-reveal mechanism.
+
+   DEVICE PALETTE = THEME-AWARE (web/DESIGN.md §2c): the screens *inside* the
+   device scenes mirror the app's real light/dark modes — a dark-mode visitor sees
+   the product as it actually looks at night, not a bright slab on an espresso
+   page. These --device-* tokens carry the light values in :root and the espresso
+   dark values under .dark; only the *physical* device parts (lid, deck, phone
+   frame, notch/island) stay dark in both modes. Page chrome uses --app-* tokens.
+   ============================================================================ */
+:root {
+  --device-canvas: #f6f3ef;
+  --device-card: #ffffff;
+  --device-ink: #2b2320;
+  --device-ink-2: #6b5d54;
+  --device-ink-3: #a2958a;
+  --device-line: #ece5dc;
+  --device-coffee: #644a40;
+  --device-on-coffee: #ffffff;
+  --device-tgt: rgba(100, 74, 64, 0.13);
+  --device-tgt-rule: rgba(100, 74, 64, 0.45);
+  --device-chip: #ffdfb5;
+  --device-chip-fg: #582d1d;
+  --device-ovl-tint: rgba(247, 243, 237, 0.92);
+  --device-ovl-ink: #241c17;
+  --device-ovl-ink-2: #6a5b50;
+  --device-ovl-rule: rgba(62, 45, 34, 0.28);
+  --device-ovl-accent: #644a40;
+  --device-ovl-sheen: rgba(255, 251, 245, 0.7);
+  /* device contact shadow on the page — theme-aware so the device sits on it */
+  --contact: rgba(40, 25, 15, 0.16);
+}
+.dark {
+  /* espresso device palette — byte-mirrors the app's dark tokens (globals.css /
+     tokens.css) so the mockup reads as the real Capecho dark mode. */
+  --device-canvas: #221b17;
+  --device-card: #2c241f;
+  --device-ink: #f0e9e0;
+  --device-ink-2: #c3b4a6;
+  --device-ink-3: #8d7e71;
+  --device-line: #3a302a;
+  --device-coffee: #e6c49b;
+  --device-on-coffee: #2b1f18;
+  --device-tgt: rgba(230, 196, 155, 0.18);
+  --device-tgt-rule: rgba(230, 196, 155, 0.5);
+  --device-chip: rgba(230, 196, 155, 0.18);
+  --device-chip-fg: #e6c49b;
+  --device-ovl-tint: rgba(31, 24, 19, 0.92);
+  --device-ovl-ink: #f1eae0;
+  --device-ovl-ink-2: #b6a698;
+  --device-ovl-rule: rgba(240, 233, 224, 0.2);
+  --device-ovl-accent: #e6c49b;
+  --device-ovl-sheen: rgba(255, 251, 245, 0.08);
+  --contact: rgba(0, 0, 0, 0.55);
+}
+
+/* ---- scroll reveal: visible by default; only hidden once JS sets .js-reveal ---- */
+.reveal {
+  opacity: 1;
+  transform: none;
+}
+.js-reveal .reveal {
+  opacity: 0;
+  transform: translateY(12px);
+  transition: opacity 0.55s ease-out, transform 0.55s ease-out;
+}
+.js-reveal .reveal.in {
+  opacity: 1;
+  transform: none;
+}
+@media (prefers-reduced-motion: reduce) {
+  .js-reveal .reveal {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+}
+
+/* ============================ device stage ============================ */
+/* The stage keeps its natural 1180×600 internal geometry at EVERY breakpoint, so
+   the laptop + phone stay correctly proportioned and positioned. On narrow
+   screens the whole stage is scaled down as a single unit (see responsive block);
+   .m-stagewrap reserves the *scaled* height and clips the horizontal overflow, so
+   the scene never bleeds into the buttons above or the caption below. */
+.m-stagewrap {
+  width: 100%;
+}
+.m-stage {
+  position: relative;
+  max-width: 1180px;
+  margin: 0 auto;
+  height: 600px;
+}
+.m-laptop {
+  position: absolute;
+  left: 34px;
+  bottom: 42px;
+  width: 736px;
+  z-index: 2;
+}
+.m-laptop::after {
+  content: "";
+  position: absolute;
+  left: 4%;
+  right: 4%;
+  bottom: -26px;
+  height: 46px;
+  background: radial-gradient(ellipse at center, var(--contact), transparent 72%);
+  filter: blur(7px);
+  z-index: -1;
+}
+.m-lid {
+  background: linear-gradient(#1a1613, #0a0807);
+  border-radius: 17px;
+  padding: 13px 13px 14px;
+  box-shadow: 0 2px 0 rgba(255, 255, 255, 0.05) inset, 0 44px 90px rgba(0, 0, 0, 0.5);
+}
+.m-display {
+  background: var(--device-canvas);
+  border-radius: 6px;
+  height: 438px;
+  overflow: hidden;
+  position: relative;
+}
+.m-notch {
+  position: absolute;
+  left: 50%;
+  top: 0;
+  transform: translateX(-50%);
+  width: 100px;
+  height: 16px;
+  background: #0a0807;
+  border-radius: 0 0 11px 11px;
+  z-index: 6;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.m-notch::after {
+  content: "";
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #150f0c;
+  box-shadow: inset 0 0 0 1px rgba(180, 200, 255, 0.12);
+}
+.m-glare {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(118deg, rgba(255, 255, 255, 0.14) 0%, rgba(255, 255, 255, 0) 20%);
+  pointer-events: none;
+  z-index: 5;
+}
+.m-deck {
+  height: 16px;
+  width: 110%;
+  margin-left: -5%;
+  background: linear-gradient(#cfc8c0, #9a928a 45%, #6f6862);
+  border-radius: 0 0 13px 13px;
+  position: relative;
+  box-shadow: 0 16px 26px rgba(0, 0, 0, 0.38);
+}
+.m-deck::before {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 0;
+  transform: translateX(-50%);
+  width: 130px;
+  height: 7px;
+  background: linear-gradient(#5f5852, #7d756e);
+  border-radius: 0 0 8px 8px;
+}
+.m-art {
+  padding: 34px 34px 0;
+  color: var(--device-ink);
+  height: 100%;
+}
+.m-art .src {
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  letter-spacing: 0.1em;
+  color: var(--device-ink-2);
+  text-transform: uppercase;
+  margin-bottom: 14px;
+}
+.m-art h3 {
+  font-family: var(--font-logo);
+  font-weight: 500;
+  font-size: 23px;
+  letter-spacing: -0.01em;
+  margin-bottom: 14px;
+  color: var(--device-ink);
+}
+.m-art p {
+  font-size: 15px;
+  line-height: 1.78;
+  color: var(--device-ink);
+  max-width: 58ch;
+}
+.m-tgt {
+  background: var(--device-tgt);
+  border-radius: 3px;
+  padding: 0 2px;
+  box-shadow: inset 0 -2px 0 var(--device-tgt-rule);
+}
+.m-caret {
+  display: inline-block;
+  width: 1.5px;
+  height: 1.05em;
+  background: var(--device-coffee);
+  vertical-align: -2px;
+  margin-left: 1px;
+}
+/* warm-glass overlay */
+.m-ovl {
+  position: absolute;
+  left: 150px;
+  top: 150px;
+  width: 410px;
+  background: var(--device-ovl-tint);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-radius: 16px;
+  box-shadow: 0 26px 56px rgba(40, 25, 15, 0.34), inset 0 1px 0 var(--device-ovl-sheen);
+  padding: 18px 20px 15px;
+  z-index: 7;
+}
+.m-ovl .hw {
+  font-family: var(--font-logo);
+  font-weight: 500;
+  font-size: 28px;
+  letter-spacing: -0.02em;
+  color: var(--device-ovl-ink);
+  padding-bottom: 9px;
+  border-bottom: 1px solid var(--device-ovl-rule);
+}
+.m-ovl .pos {
+  font-family: var(--font-sans);
+  font-size: 12px;
+  color: var(--device-ovl-ink-2);
+  margin-top: 10px;
+}
+.m-ovl .mean {
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--device-ovl-ink);
+  margin-top: 7px;
+}
+.m-ovl .field {
+  margin-top: 11px;
+  border: 1px solid var(--device-ovl-rule);
+  border-radius: 9px;
+  padding: 8px 10px;
+}
+.m-ovl .field .flab {
+  font-family: var(--font-mono);
+  font-size: 8.5px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--device-ovl-ink-2);
+  display: block;
+  margin-bottom: 3px;
+}
+.m-ovl .field .ctx {
+  font-style: italic;
+  font-size: 12.5px;
+  color: var(--device-ovl-ink);
+  line-height: 1.45;
+}
+.m-ovl .row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 13px;
+}
+.m-ovl .lang {
+  font-family: var(--font-sans);
+  font-size: 12px;
+  color: var(--device-ovl-ink-2);
+  border: 1px solid var(--device-ovl-rule);
+  border-radius: 7px;
+  padding: 5px 9px;
+}
+.m-ovl .save {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-family: var(--font-sans);
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--device-ovl-ink);
+  border: 1px solid var(--device-ovl-accent);
+  border-radius: 8px;
+  padding: 6px 14px;
+}
+.m-ovl .save .dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--device-ovl-accent);
+}
+
+/* iPhone */
+.m-phone {
+  position: absolute;
+  right: 26px;
+  bottom: 8px;
+  width: 252px;
+  z-index: 6;
+}
+.m-phone::after {
+  content: "";
+  position: absolute;
+  left: 8%;
+  right: 8%;
+  bottom: -20px;
+  height: 36px;
+  background: radial-gradient(ellipse at center, var(--contact), transparent 72%);
+  filter: blur(7px);
+  z-index: -1;
+}
+.m-pframe {
+  background: linear-gradient(150deg, #3a342f, #0c0907 40%);
+  border-radius: 48px;
+  padding: 11px;
+  box-shadow: inset 0 0 0 1.5px rgba(255, 255, 255, 0.08), 0 40px 74px rgba(0, 0, 0, 0.55);
+}
+.m-pscreen {
+  background: var(--device-canvas);
+  border-radius: 38px;
+  overflow: hidden;
+  height: 512px;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+}
+.m-pglare {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(125deg, rgba(255, 255, 255, 0.12), transparent 16%);
+  pointer-events: none;
+  z-index: 6;
+  border-radius: 38px;
+}
+.m-island {
+  position: absolute;
+  left: 50%;
+  top: 11px;
+  transform: translateX(-50%);
+  width: 88px;
+  height: 25px;
+  background: #0c0907;
+  border-radius: 14px;
+  z-index: 5;
+}
+.m-pstat {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px 16px 0;
+  color: var(--device-ink);
+}
+.m-pstat .t {
+  font-family: var(--font-sans);
+  font-size: 13px;
+  font-weight: 600;
+}
+.m-pstat .ico {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.m-prev {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  padding: 26px 16px 16px;
+}
+.m-prev .ph-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  color: var(--device-coffee);
+}
+.m-prev .ph-top .lab {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-logo);
+  font-weight: 600;
+  font-size: 14px;
+}
+.m-prev .ph-top .meta {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.05em;
+  color: var(--device-ink-3);
+  text-transform: uppercase;
+}
+.m-prev .pctx {
+  font-size: 16px;
+  line-height: 1.6;
+  color: var(--device-ink);
+  margin-top: 20px;
+}
+.m-prev .pctx .hl {
+  background: var(--device-chip);
+  color: var(--device-chip-fg);
+  padding: 0 4px;
+  border-radius: 3px;
+}
+.m-prev .answer {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  gap: 5px;
+}
+.m-prev .answer .w {
+  font-family: var(--font-logo);
+  font-weight: 500;
+  font-size: 40px;
+  letter-spacing: -0.02em;
+  color: var(--device-ink);
+}
+.m-prev .answer .ipa {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--device-ink-3);
+}
+.m-prev .answer .echo {
+  color: var(--device-coffee);
+  margin-top: 6px;
+}
+.m-rate {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 7px;
+}
+.m-rate span {
+  text-align: center;
+  font-family: var(--font-sans);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  padding: 12px 0;
+  border-radius: 10px;
+  border: 1px solid var(--device-line);
+  color: var(--device-ink-2);
+}
+.m-rate span.good {
+  background: var(--device-coffee);
+  color: var(--device-on-coffee);
+  border-color: var(--device-coffee);
+}
+
+/* ===================== capture-moment frame (how-it-works) ===================== */
+.m-capframe {
+  background: var(--device-canvas);
+  border: 1px solid var(--device-line);
+  border-radius: 14px;
+  padding: 26px 26px 24px;
+  box-shadow: 0 22px 50px rgba(40, 25, 15, 0.2), 0 2px 7px rgba(40, 25, 15, 0.1),
+    inset 0 1px 0 var(--device-ovl-sheen);
+}
+.m-capframe .src {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  color: var(--device-ink-2);
+  text-transform: uppercase;
+  margin-bottom: 10px;
+}
+.m-capframe .art-mini {
+  color: var(--device-ink);
+  font-size: 14.5px;
+  line-height: 1.72;
+}
+.m-capframe .art-mini .m-tgt {
+  background: var(--device-tgt);
+}
+.m-capframe .m-ovl {
+  position: relative;
+  left: auto;
+  top: auto;
+  width: 100%;
+  margin-top: 18px;
+  box-shadow: 0 16px 36px rgba(40, 25, 15, 0.22), inset 0 1px 0 rgba(255, 251, 245, 0.7);
+  padding: 16px 18px 14px;
+}
+.m-capframe .m-ovl .hw {
+  font-size: 24px;
+}
+
+/* ============================ responsive ============================ */
+/* Scale the whole stage to fit narrower screens. The stage is pinned to its
+   natural 1180px width (so proportions/positions are preserved, just smaller);
+   the wrapper reserves the scaled height and clips the horizontal overflow that
+   the pinned width creates — preventing both sideways page-scroll and any
+   vertical overlap with neighbouring sections. */
+@media (max-width: 920px) {
+  .m-stagewrap {
+    overflow: hidden;
+    height: 322px; /* ≈ visible composition height at scale .52 */
+  }
+  .m-stage {
+    width: 1180px;
+    max-width: none;
+    transform: scale(0.52);
+    /* Scale from the top-LEFT, then center the SCALED box by hand:
+       margin-left = half the wrapper − half the scaled stage width. A
+       `top center` origin scales around the 1180px stage's own midpoint
+       (~590px), which on a narrow phone strands the whole composition off
+       to the right — only a sliver shows (the devices look "missing"). */
+    transform-origin: top left;
+    margin-left: calc(50% - 1180px * 0.52 / 2);
+  }
+}
+@media (max-width: 560px) {
+  .m-stagewrap {
+    height: 180px; /* ≈ visible composition height at scale .28 */
+    margin-top: 6px;
+  }
+  .m-stage {
+    transform: scale(0.28);
+    margin-left: calc(50% - 1180px * 0.28 / 2);
+  }
+}

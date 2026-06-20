@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<!--
+  Mac App Store variant of Release.entitlements (T10 Phase 1). Mirrors the direct-distribution Release
+  entitlements with TWO removals:
+    • `com.apple.security.temporary-exception.mach-lookup.global-name` — the `-spks`/`-spki` Sparkle
+      installer XPC services (SUEnableInstallerLauncherService). The MAS build links no Sparkle, so those
+      XPC names don't exist; App Review also flags temporary-exception entitlements.
+    • `com.apple.developer.aps-environment` — the app NEVER registers for remote/push notifications (the
+      daily reminder uses LOCAL UNUserNotificationCenter only, via capture_native), so the push
+      entitlement is spurious. A `development` APS value in a store build is an upload/review risk, so
+      dropping it is correct (local notifications need no entitlement).
+  Everything else mirrors the known-good direct build: App Sandbox, network client, user-selected file
+  access, the Google Sign-In keychain group. The ⌥E global hotkey uses Carbon RegisterEventHotKey
+  (HotKeyController.swift) — sandbox-safe, no extra entitlement, no Accessibility/Input-Monitoring. Screen
+  capture uses the user-granted Screen Recording permission (no entitlement). Applied by
+  scripts/macos/build_mas.sh, which archives the stock Release configuration with CODE_SIGN_ENTITLEMENTS
+  overridden to this file (there is no separate Release-MAS build configuration).
+
+  ADDED for the App Store build only: `com.apple.developer.applesignin` — Sign in with Apple. Guideline
+  4.8 requires offering it alongside Google on the store build, and the MAS provisioning profile permits
+  the entitlement (Developer ID profiles forbid it, which is why the direct Release.entitlements omits
+  it). The shared SignInPanel shows "Continue with Apple" when `isMacAppStoreBuild()` is true. Requires
+  the Sign in with Apple capability on the com.capecho.app App ID (already enabled for iOS).
+-->
+<plist version="1.0">
+<dict>
+	<key>com.apple.developer.applesignin</key>
+	<array>
+		<string>Default</string>
+	</array>
+	<key>com.apple.security.app-sandbox</key>
+	<true/>
+	<key>com.apple.security.files.user-selected.read-write</key>
+	<true/>
+	<key>com.apple.security.network.client</key>
+	<true/>
+	<key>keychain-access-groups</key>
+	<array>
+		<string>$(AppIdentifierPrefix)com.google.GIDSignIn</string>
+	</array>
+</dict>
+</plist>

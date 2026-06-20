@@ -1,0 +1,19 @@
+name: capecho_local_store
+description: >-
+  Capecho's device-local store — the pre-login, single-user mirror of the backend `words` /
+  `word_contexts` tables, plus the idempotent drain of the native capture journal. Pure Dart
+  (dependency-light): the unit normalizer is INJECTED (the app wires `localDedupKey`, a deterministic
+  no-lemmatization key; tests pass a stub), so the package is `dart test`-able with no native deps.
+  This is load-bearing "zero silent failures" correctness code — re-draining the same
+  journal entries must never duplicate words/contexts and must never move the drain cursor backwards.
+publish_to: none
+version: 0.1.0
+
+environment:
+  sdk: ^3.4.0
+
+dependencies:
+  sqlite3: ^3.3.2
+
+dev_dependencies:
+  test: ^1.24.0

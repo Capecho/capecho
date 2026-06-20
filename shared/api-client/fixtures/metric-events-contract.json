@@ -1,0 +1,35 @@
+{
+  "_comment": "The §14 metric-event contract — the SINGLE source of truth for the event shape. The macOS client emits these; the backend validates them. The Dart contract (capecho_api: lib/src/metric_event.dart) AND the TS validator (backend/src/metrics.ts METRIC_CONTRACT) each assert equality to THIS file in CI, so a Dart<->TS drift fails the build (same posture as the normalization golden vectors / DES-2 token gate). Bump `version` only alongside both ports + a migration story.",
+  "version": 1,
+  "maxDurationMs": 3600000,
+  "events": {
+    "capture_completed": {
+      "needsClientRowId": true,
+      "fields": {
+        "selToPanelMs": { "type": "int", "min": 0, "max": 3600000 },
+        "panelToSaveMs": { "type": "int", "min": 0, "max": 3600000 },
+        "totalMs": { "type": "int", "min": 0, "max": 3600000 },
+        "source": { "type": "enum", "values": ["ocr", "clipboard", "selection"] },
+        "hasContext": { "type": "bool" },
+        "langOverride": { "type": "bool" }
+      }
+    },
+    "capture_presented": {
+      "needsClientRowId": false,
+      "fields": {
+        "selToPanelMs": { "type": "int", "min": 0, "max": 3600000 },
+        "source": { "type": "enum", "values": ["ocr", "clipboard", "selection"] }
+      }
+    },
+    "capture_abandoned": {
+      "needsClientRowId": false,
+      "fields": { "selToPanelMs": { "type": "int", "min": 0, "max": 3600000 } }
+    },
+    "capture_failed": {
+      "needsClientRowId": false,
+      "fields": { "errorKind": { "type": "enum", "values": ["ocr", "permission", "native", "unknown"] } }
+    },
+    "sync_attempted": { "needsClientRowId": true, "fields": {} },
+    "sync_accepted": { "needsClientRowId": true, "fields": {} }
+  }
+}

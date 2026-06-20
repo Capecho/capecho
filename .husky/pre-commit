@@ -1,0 +1,19 @@
+# Keep staged Dart formatted to the CI gate (`dart format -l 100`) so the format check can't fail in CI.
+# Mirrors the .github format step's excludes (.dart_tool / build / generated). Auto-formats + re-stages
+# any offending file rather than blocking, so the commit lands CI-clean.
+command -v dart >/dev/null 2>&1 || { echo "husky: 'dart' not on PATH — skipping the Dart format check"; exit 0; }
+
+# `|| true`: husky runs this hook under `sh -e`, and grep exits 1 when nothing matches (e.g. a commit
+# with no Dart files) — which would otherwise abort the hook.
+files=$(git diff --cached --name-only --diff-filter=ACM -- '*.dart' \
+  | grep -v -e '/\.dart_tool/' -e '/build/' -e '/generated/' || true)
+[ -z "$files" ] && exit 0
+
+# Already formatted → nothing to do.
+echo "$files" | xargs dart format -l 100 --output=none --set-exit-if-changed >/dev/null 2>&1 && exit 0
+
+# Some need formatting → format in place and re-stage so the commit is CI-clean.
+echo "husky: formatting Dart to -l 100 and re-staging:"
+echo "$files" | sed 's/^/  • /'
+echo "$files" | xargs dart format -l 100 >/dev/null
+echo "$files" | xargs git add

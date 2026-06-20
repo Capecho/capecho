@@ -1,0 +1,58 @@
+// Application-level settings for the Runner target.
+//
+// This may be replaced with something auto-generated from metadata (e.g., pubspec.yaml) in the
+// future. If not, the values below would default to using the project name when this becomes a
+// 'flutter create' template.
+
+// The application's name. By default this is also the title of the Flutter window.
+PRODUCT_NAME = Capecho
+
+// The application's bundle identifier. Unified across macOS + iOS so native Sign in with Apple's
+// identity-token `aud` matches the backend's APPLE_CLIENT_ID (com.capecho.app).
+PRODUCT_BUNDLE_IDENTIFIER = com.capecho.app
+
+// The copyright displayed in application information
+PRODUCT_COPYRIGHT = Copyright © 2026 com.capecho. All rights reserved.
+
+// Google sign-in OAuth redirect: the reversed iOS client id, registered as the CFBundleURLTypes
+// scheme in Info.plist via $(GOOGLE_REVERSED_CLIENT_ID). Empty → Google sign-in unavailable (Apple +
+// email unaffected). Not a secret.
+GOOGLE_REVERSED_CLIENT_ID = com.googleusercontent.apps.1096137361732-7jj4fesli3vctk5ir0o95uncjg1m5kbf
+
+// ───────────────────────── Sparkle auto-update (DIRECT build only) ─────────────────────────
+// Sparkle ships ONLY in the direct Developer ID build, NEVER the Mac App Store build (MAS forbids
+// self-update, and Sparkle's non-sandboxed XPC helpers fail App-Store validation). SPARKLE_ENABLED is
+// the single master switch gating everything Sparkle touches — the SPARKLE compile flag, linking, and
+// embedding. It DEFAULTS OFF here, so the App Store archive AND every unconfigured path (Debug/Profile
+// `flutter run`, a plain Xcode "Product ▸ Archive") are Sparkle-free by construction. Only
+// scripts/macos/build_release.sh opts IN, by passing SPARKLE_ENABLED=YES to its `xcodebuild … archive`
+// for the shipped direct binary; scripts/macos/build_mas.sh leaves the default (and asserts the archive
+// is Sparkle-free). The framework is vendored at macos/Frameworks/Sparkle.framework, pinned to 2.9.2 —
+// keep it in lockstep with the SPARKLE_BIN generate_appcast tooling (DISTRIBUTION.md). The four Sparkle
+// touch-points live behind `#if SPARKLE` in AppDelegate.swift.
+SPARKLE_ENABLED = NO
+
+// The vendored framework sits next to the project; the search path is needed at compile time (the
+// Sparkle modulemap, for `import Sparkle`) and link time. Harmless when SPARKLE_ENABLED=NO — nothing
+// references it, so it is neither imported, linked, nor embedded.
+FRAMEWORK_SEARCH_PATHS = $(inherited) $(PROJECT_DIR)/Frameworks
+
+// ON → define SPARKLE so AppDelegate's `#if SPARKLE` blocks (import, the SPUStandardUpdaterController
+// property, the "Check for Updates…" status-menu row, checkForUpdates()) compile in. OFF → the
+// SPARKLE_SWIFT_CONDITION_NO var is undefined, so the nested expansion yields empty. `$(inherited)`
+// preserves DEBUG on the Debug config.
+SWIFT_ACTIVE_COMPILATION_CONDITIONS = $(inherited) $(SPARKLE_SWIFT_CONDITION_$(SPARKLE_ENABLED))
+SPARKLE_SWIFT_CONDITION_YES = SPARKLE
+
+// ON → link Sparkle. OFF → empty, so the binary carries NO Sparkle load command (verifiable via
+// `otool -L`). Linking via OTHER_LDFLAGS (not the "Link Binary With Libraries" phase) keeps it a pure
+// per-config build setting, so the MAS path drops it deterministically.
+OTHER_LDFLAGS = $(inherited) $(SPARKLE_LDFLAGS_$(SPARKLE_ENABLED))
+SPARKLE_LDFLAGS_YES = -framework Sparkle
+
+// Embedding is a target-wide Copy Files build phase ("Embed Sparkle (direct build only)" in the Runner
+// target) — Xcode build phases can't be per-config — so it is gated with a per-config exclusion instead:
+// OFF drops Sparkle.framework from that phase, leaving NO Contents/Frameworks/Sparkle.framework in the
+// bundle. ON → SPARKLE_EXCLUDED_YES is undefined → empty → the framework embeds (CodeSignOnCopy).
+EXCLUDED_SOURCE_FILE_NAMES = $(inherited) $(SPARKLE_EXCLUDED_$(SPARKLE_ENABLED))
+SPARKLE_EXCLUDED_NO = Sparkle.framework

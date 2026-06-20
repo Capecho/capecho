@@ -1,0 +1,111 @@
+name: capecho_mobile
+description: >-
+  Capecho for iOS + Android — the "echo" half of the capture→echo loop: review the words you captured
+  on your Mac with spaced repetition, on the phone. Mobile is review + reminders only (capture is
+  macOS). The auth + review logic and the design system are shared with the macOS client via
+  capecho_app_core, so the two clients can't drift.
+publish_to: 'none'
+
+# Dev default only; release name/number derive from the canonical /VERSION at build time.
+version: 0.1.12+11200
+
+environment:
+  sdk: ^3.12.0
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  cupertino_icons: ^1.0.8
+
+  # The shared app core: the platform-agnostic AuthController + ReviewController, the sign-in panel,
+  # the warm design system, and the HTTP transport — ONE implementation shared with macOS.
+  capecho_app_core:
+    path: ../../shared/app-core
+  # The typed backend client (also a transitive dep of app_core) — named here for the model types
+  # (ClaimRow, Rating, Account, …) this app references directly.
+  capecho_api:
+    path: ../../shared/api-client
+
+  # Native Apple + Google sign-in. The credential wrappers live in app_core (the only file touching the
+  # plugins); this app supplies the per-build OAuth client ids and must declare the plugins so Flutter
+  # registers them on iOS/Android.
+  sign_in_with_apple: ^8.0.0
+  google_sign_in: ^7.2.0
+
+  # Session token at rest: iOS Keychain / Android secure storage. (macOS deliberately uses a file
+  # store to stay SwiftPM-pure; on mobile the CocoaPods/Gradle plugin path is the norm.)
+  flutter_secure_storage: ^10.3.1
+
+  # The daily review reminder (US-14.1) fires as a CLIENT-LOCAL notification: the account stores the
+  # preference, the phone schedules the OS notification. flutter_local_notifications is the iOS +
+  # Android engine behind capecho_app_core's ReminderNotifications gateway; `timezone` (its peer dep)
+  # makes the repeating schedule land at the user's LOCAL wall-clock time, and `flutter_timezone`
+  # resolves the device's IANA zone (also used to stamp the account's review-day boundary at sign-in).
+  # (macOS does NOT use these — it goes native via capture_native to stay SwiftPM-pure.)
+  flutter_local_notifications: ^21.0.0
+  timezone: ^0.11.0
+  flutter_timezone: ^5.1.0
+
+  # Settings → About: read the app version from the bundle (package_info_plus). The legal/contact pages
+  # open IN-APP (webview_flutter) rather than bouncing to the system browser; url_launcher remains for the
+  # in-app browser's "open in browser" fallback + any mailto. The version reader lives in
+  # capecho_app_core; declared here too so Flutter registers the plugin on iOS/Android.
+  package_info_plus: ^8.0.0
+  url_launcher: ^6.3.0
+  # Settings → About opens the privacy/terms/contact pages in an in-app WKWebView / Android WebView so the
+  # reader never leaves Capecho.
+  webview_flutter: ^4.13.1
+
+  # Word Book → Export: hand the built file (CSV or the one-click Anki `.apkg`) to the system share sheet
+  # (save to Files, AirDrop, mail, …) — the mobile equivalent of the macOS save panel. `path_provider`
+  # gives a temp path to write the bytes before sharing. The `.apkg` itself is built by the shared
+  # AnkiDeckBuilder (capecho_app_core), which needs `sqlite3`: v3 bundles SQLite for iOS + Android via
+  # Dart hooks (native assets), so the deprecated `sqlite3_flutter_libs` is NOT needed.
+  share_plus: ^12.0.2
+  path_provider: ^2.1.5
+  sqlite3: ^3.3.2
+
+  # Settings → Reminders: when the daily reminder is on but the OS notification permission is denied, the
+  # warning's "Open Settings" jumps straight to Capecho's notification settings (iOS + Android).
+  app_settings: ^7.0.0
+
+  # The home-screen review widget (iOS): app_links delivers the widget's capecho:// deep link (it
+  # supports SPM). The App-Group bridge (snapshot out, grade queue in) is a plain MethodChannel in
+  # Runner (WidgetChannel.swift) — NO plugin, so the mobile iOS build stays SwiftPM-pure (no Podfile).
+  # The shared orchestration is capecho_app_core's WidgetBridge; the UI is the native SwiftUI extension
+  # (ios/CapechoReviewWidget). Android has no widget surface — the ChannelWidgetHost calls no-op there.
+  app_links: ^6.3.0
+
+  # Pro subscription (iOS): the App Store IAP rail. `in_app_purchase` pulls `in_app_purchase_storekit`,
+  # which defaults to StoreKit 2 on iOS 15+ — so a purchase's `serverVerificationData` is the App
+  # Store-signed JWS (`jwsRepresentation`), which we POST straight to `/billing/apple/verify` for the
+  # server's API-authority check (no client-side receipt parsing). Android is consume-only (buy on the
+  # web) — no Play Billing here; the upgrade entry is iOS-only. The buy logic lives in lib/billing/.
+  in_app_purchase: ^3.2.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^6.0.0
+
+  # Generates the iOS + Android launcher icons from the shared macOS app-icon artwork (below).
+  flutter_launcher_icons: ^0.14.0
+
+flutter:
+  uses-material-design: true
+
+# Mobile app icon: generated from the macOS app-icon artwork, but with a mobile-specific full-bleed
+# source so the macOS transparent padding / rounded tile edge never ships on iOS or Android.
+# Android adaptive uses the inverted foreground treatment: transparent padding around a cream tile
+# with the coffee echo mark.
+# Regenerate after an artwork change:
+#   cd clients/mobile && dart run flutter_launcher_icons
+flutter_launcher_icons:
+  android: true
+  ios: true
+  image_path: "assets/app_icon.png"
+  adaptive_icon_background: "#FFDFB5"
+  adaptive_icon_foreground: "assets/app_icon_foreground.png"
+  adaptive_icon_foreground_inset: 0
+  min_sdk_android: 21

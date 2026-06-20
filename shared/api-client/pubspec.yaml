@@ -1,0 +1,17 @@
+name: capecho_api
+description: >-
+  Capecho's typed backend client — the shared Dart contract the mobile + macOS Flutter clients use to
+  talk to the Cloudflare Workers API (auth, words, FSRS review, sync, claim, explain, contexts,
+  export). Pure Dart (no Flutter, no `http`): the HTTP transport is INJECTED (the app wires a
+  package:http adapter; tests pass a fake), so the request-building + response-parsing — the part that
+  must track the backend wire contract exactly — is `dart test`-able with no network. Field casing
+  mirrors the server verbatim (snake_case request bodies for words/review/claim/auth; camelCase
+  response bodies for review-due/projected-card/explain/contexts); drift here silently breaks sync.
+publish_to: none
+version: 0.1.0
+
+environment:
+  sdk: ^3.4.0
+
+dev_dependencies:
+  test: ^1.24.0

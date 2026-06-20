@@ -1,0 +1,16 @@
+Capecho — a capture-first vocabulary memory tool
+Copyright (C) 2026 Capecho
+
+Capecho is source-available under the Functional Source License, Version 1.1,
+with an Apache 2.0 future license (FSL-1.1-Apache-2.0). You may read, self-host,
+modify, and use the Software for any purpose except a Competing Use; two years
+after each release, that release is additionally licensed under Apache-2.0. The
+full terms are in the LICENSE file at the repository root.
+
+This product also includes third-party components distributed under their own
+licenses. The full list and license texts are in THIRD_PARTY_NOTICES.md — most
+notably the bundled Sparkle auto-update framework (MIT), vendored at
+clients/macos/macos/Frameworks/Sparkle.framework.
+
+"Capecho" and the Capecho logo are trademarks of Capecho and are NOT licensed
+under the FSL. See TRADEMARK.md.

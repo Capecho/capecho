@@ -1,0 +1,297 @@
+/* ============================================================================
+   Capecho — Design Tokens
+   CANONICAL SOURCE for all token VALUES (palette, type, spacing, shadow). The
+   clients' Dart/Swift tokens are generated from THIS file (via shared/design-tokens);
+   nothing reads DESIGN.md at build time. DESIGN.md owns the design intent + rules
+   and points here for the numbers — change a value HERE, then regenerate.
+   Do NOT invent colors. A few foundation-level decisions DESIGN.md is
+   silent on are called out inline where they live:
+     - app card radii (--app-radius / --app-radius-sm) — DESIGN.md is silent;
+     - headline-s optical size (--t-headline-s-opsz) — a foundation choice;
+     - the overlay NSVisualEffectView material (--ovl-material) is not a token here:
+       in this static mockup it is approximated by the tint (--ovl-tint) layered
+       over a CSS backdrop blur, not a single material token.
+
+   Two NAMESPACED palettes:
+     overlay  →  --ovl-*   (warm-tinted glass + ONE restrained accent — the save mark)
+     app      →  --app-*   (warm Caffeine coffee)
+   plus semantic, spacing, radii, and shadow tokens.
+
+   ----------------------------------------------------------------------------
+   DUAL-THEME MECHANISM (used by every surface file)
+   ----------------------------------------------------------------------------
+   - Light values are defined under BOTH :root and [data-theme="light"].
+   - Dark values are defined under [data-theme="dark"].
+   - A @media (prefers-color-scheme: dark) block re-applies dark values to :root,
+     so a standalone page follows the OS automatically.
+   This lets ONE page place two wrappers side by side to show both modes at once:
+       <div data-theme="light"> … light surface … </div>
+       <div data-theme="dark">  … dark surface  … </div>
+   The [data-theme] attribute always WINS over the OS media query (explicit
+   wrapper beats system pref), because the attribute selector + media:root have
+   equal specificity and the attribute rules are authored later in the cascade.
+   ============================================================================ */
+
+/* ---------------------------------------------------------------------------
+   PALETTE-INDEPENDENT TOKENS (mode-agnostic)
+   --------------------------------------------------------------------------- */
+:root {
+  /* --- Type families (DESIGN.md §Typography) --- */
+  --font-display: 'Fraunces', Georgia, 'Times New Roman', serif;
+  --font-body: 'Charter', 'Source Serif 4', Georgia, serif;
+  --font-chrome: -apple-system, system-ui, 'SF Pro Text', 'Segoe UI', Roboto, sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, 'SFMono-Regular', Menlo, monospace;
+
+  /* --- Type scale: size · weight · line-height · letter-spacing · opsz ---
+     (DESIGN.md §Scale (px); roles marked post-MVP still get tokens) */
+  --t-display-hero-size: 56px;
+  --t-display-hero-weight: 500;
+  --t-display-hero-lh: 1.04;
+  --t-display-hero-tracking: -0.025em;
+  --t-display-hero-opsz: 144;
+
+  --t-display-size: 32px;
+  --t-display-weight: 500;
+  --t-display-lh: 1.1;
+  --t-display-tracking: -0.02em;
+  --t-display-opsz: 96;
+
+  --t-headline-l-size: 24px;
+  --t-headline-l-weight: 500;
+  --t-headline-l-lh: 1.2;
+  --t-headline-l-tracking: 0;
+  --t-headline-l-opsz: 72;
+
+  --t-headline-s-size: 20px;
+  --t-headline-s-weight: 500;
+  --t-headline-s-lh: 1.25;
+  --t-headline-s-tracking: 0;
+  --t-headline-s-opsz: 48;
+
+  --t-body-l-size: 17px;
+  --t-body-l-weight: 400;
+  --t-body-l-lh: 1.65;
+  --t-body-l-tracking: 0;
+
+  --t-body-size: 16px;          /* overlay core meaning */
+  --t-body-weight: 400;
+  --t-body-lh: 1.6;
+  --t-body-tracking: 0;
+
+  --t-body-s-size: 15px;        /* Charter italic — saved context sentence */
+  --t-body-s-weight: 400;
+  --t-body-s-lh: 1.5;
+  --t-body-s-tracking: 0;
+
+  --t-chrome-size: 14px;        /* System — buttons, labels */
+  --t-chrome-weight: 500;
+  --t-chrome-lh: 1.3;
+  --t-chrome-tracking: 0;
+
+  --t-chrome-s-size: 13px;      /* System — menu items */
+  --t-chrome-s-weight: 500;
+  --t-chrome-s-lh: 1.3;
+  --t-chrome-s-tracking: 0;
+
+  --t-chrome-meta-size: 12px;   /* System — eyebrows, breadcrumbs */
+  --t-chrome-meta-weight: 500;
+  --t-chrome-meta-lh: 1.3;
+  --t-chrome-meta-tracking: 0;
+
+  --t-meta-pill-size: 11px;     /* System — tags (CEFR pills = post-MVP) */
+  --t-meta-pill-weight: 600;
+  --t-meta-pill-lh: 1.2;
+  --t-meta-pill-tracking: 0.04em;
+
+  --t-meta-tag-size: 10px;      /* System — captions */
+  --t-meta-tag-weight: 600;
+  --t-meta-tag-lh: 1.2;
+  --t-meta-tag-tracking: 0.06em;
+
+  --t-mono-size: 14px;          /* JetBrains Mono — data, dates */
+  --t-mono-weight: 400;
+  --t-mono-lh: 1.4;
+  --t-mono-tracking: 0;
+
+  --t-phonetic-size: 13px;      /* JetBrains Mono — IPA (post-MVP / Lookup) */
+  --t-phonetic-weight: 400;
+  --t-phonetic-lh: 1.4;
+  --t-phonetic-tracking: 0;
+
+  --t-mono-meta-size: 11px;     /* JetBrains Mono — debug, snapshots */
+  --t-mono-meta-weight: 400;
+  --t-mono-meta-lh: 1.4;
+  --t-mono-meta-tracking: 0;
+
+  /* --- Spacing scale (DESIGN.md §Spacing — base 4px) --- */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-12: 48px;
+  --space-16: 64px;
+
+  /* --- Overlay paddings (DESIGN.md §Spacing) --- */
+  --ovl-pad-lr: 28px;
+  --ovl-pad-top: 28px;
+  --ovl-pad-bottom: 22px;
+  --ovl-gap-header: 16px;   /* header → core meaning */
+  --ovl-gap-bottom: 22px;   /* content → bottom-row affordances */
+
+  /* --- Radii --- */
+  --ovl-radius: 16px;       /* DESIGN.md §Overlay --ovl-radius:16 */
+  /* App card radius — DESIGN.md is SILENT. Foundation decision: 11px.
+     Chosen mid-range (10–12 brief) to match the calm/mature/fine-press anchor:
+     softer than a sticker, crisper than a pill. */
+  --app-radius: 11px;
+  --app-radius-sm: 8px;     /* derived: chips, small controls */
+
+  /* --- Reading measure (DESIGN.md §Reader's measure) --- */
+  --reading-measure: 65ch;
+
+  /* --- Window ambient shadow (DESIGN.md §Shadows / Brand) --- */
+  --window-ambient: 0 30px 70px rgba(40, 25, 15, 0.30);
+}
+
+/* ===========================================================================
+   LIGHT MODE  —  :root  AND  [data-theme="light"]
+   =========================================================================== */
+:root,
+[data-theme="light"] {
+  /* --- Overlay: Warm Glass (light) — DESIGN.md §Overlay light --- */
+  --ovl-tint: rgba(246, 242, 236, 0.72);       /* warm off-white glass, tied to Caffeine canvas */
+  --ovl-edge: rgba(255, 251, 245, 0.58);       /* warm top sheen + hairline */
+  --ovl-ink: #241c17;                          /* warm dark-roast primary */
+  --ovl-ink-2: #6a5b50;                        /* warm secondary (POS, SECTION LABELS) */
+  --ovl-ink-3: #9c8d80;                        /* warm muted (rare; never eyebrows) */
+  --ovl-divider: rgba(62, 45, 34, 0.14);
+  --ovl-rule: rgba(62, 45, 34, 0.34);          /* warm hairline under headword */
+  --ovl-save-edge: rgba(62, 45, 34, 0.40);     /* outlined Save (no fill) */
+  /* language-picker ACTIVE row: WCAG-AA-legible ink on the active fill (the
+     low-contrast tint-on-rule was the one weak spot, XS-2). Strong warm ink
+     near --ovl-ink so the secondary native-name stays readable on glass. */
+  --ovl-active-fg: #2c211a;                    /* active-row text on glass (warm, light) */
+  --ovl-active-bg: rgba(62, 45, 34, 0.10);     /* active-row fill (light) */
+  --ovl-accent: #644a40;                       /* the single restrained Capecho accent (coffee) = --app-primary */
+
+  /* --- App: Caffeine (light) — DESIGN.md §App light --- */
+  --app-canvas: #f6f3ef;       /* warm off-white app background */
+  --app-card: #ffffff;         /* cards / rows / panels */
+  --app-titlebar: #efeae3;     /* macOS toolbar, mobile tab bar */
+  --app-ink: #2b2320;          /* primary text (dark roast) */
+  --app-ink-2: #6b5d54;        /* secondary */
+  --app-ink-3: #a2958a;        /* muted (dates, index numbers, captions) */
+  --app-line: #ece5dc;         /* hairlines, card borders */
+  --app-primary: #644a40;      /* coffee brown — buttons, active nav, "due" echo */
+  --app-primary-fg: #ffffff;
+  --app-chip: #ffdfb5;         /* latte — CEFR pills / tags background */
+  --app-chip-fg: #582d1d;      /* dark roast — text on chips */
+  --app-primary-soft: rgba(100, 74, 64, 0.13); /* active-tab wash, hover */
+
+  /* --- App double-edge shadow system (DESIGN.md §Shadows) --- */
+  --app-edge: #2b2320;         /* edge border + offset color (light) */
+  --shadow-edge: 3px 3px 0 var(--app-edge);
+  --shadow-edge-sm: 2px 2px 0 var(--app-edge);
+  --shadow-edge-press: 1px 1px 0 var(--app-edge);
+  --shadow-edge-soft: 4px 5px 0 rgba(43, 35, 32, 0.13);
+  --shadow-edge-soft-hover: 5px 7px 0 rgba(43, 35, 32, 0.16);
+
+  /* --- Semantic (app, both modes — DESIGN.md §Semantic) --- */
+  --success: #5a6a48;   /* library sage */
+  --warning: #a8741e;   /* ochre */
+  --error: #8a2a1e;     /* deep oxblood */
+  --info: #4a5a6a;      /* slate */
+}
+
+/* ===========================================================================
+   DARK MODE  —  [data-theme="dark"]
+   =========================================================================== */
+[data-theme="dark"] {
+  /* --- Overlay: Warm Glass (dark) — DESIGN.md §Overlay dark --- */
+  --ovl-tint: rgba(34, 26, 21, 0.70);          /* warm espresso glass, tied to #221b17 */
+  --ovl-edge: rgba(255, 248, 240, 0.16);
+  --ovl-ink: #f1eae0;                          /* warm off-white primary */
+  --ovl-ink-2: #c4b5a7;
+  --ovl-ink-3: #8e7f72;
+  --ovl-divider: rgba(240, 233, 224, 0.12);
+  --ovl-rule: rgba(240, 233, 224, 0.40);
+  --ovl-save-edge: rgba(240, 233, 224, 0.30);
+  /* language-picker ACTIVE row (XS-2): strong warm light ink near --ovl-ink so
+     the secondary native-name stays WCAG-legible on the active fill on glass. */
+  --ovl-active-fg: #f6efe6;                    /* active-row text on glass (warm, dark) */
+  --ovl-active-bg: rgba(240, 233, 224, 0.12);  /* active-row fill (dark) */
+  --ovl-accent: #e6c49b;                       /* warm latte accent = --app-primary (dark) */
+
+  /* --- App: Caffeine Espresso (dark) — DESIGN.md §App dark --- */
+  --app-canvas: #221b17;
+  --app-card: #2c241f;
+  --app-titlebar: #1c1611;
+  --app-ink: #f0e9e0;
+  --app-ink-2: #c3b4a6;
+  --app-ink-3: #8d7e71;
+  --app-line: #3a302a;
+  --app-primary: #e6c49b;      /* warm latte — bright actor on dark */
+  --app-primary-fg: #2b1f18;
+  --app-chip: rgba(230, 196, 155, 0.16);
+  --app-chip-fg: #e6c49b;
+  --app-primary-soft: rgba(230, 196, 155, 0.18);
+
+  /* --- App double-edge shadow system (dark edge) --- */
+  --app-edge: #100c0a;         /* DESIGN.md: dark edge */
+  --shadow-edge: 3px 3px 0 var(--app-edge);
+  --shadow-edge-sm: 2px 2px 0 var(--app-edge);
+  --shadow-edge-press: 1px 1px 0 var(--app-edge);
+  /* soft "stacked paper" shadows keep the same warm-ink rgba on dark —
+     DESIGN.md specifies the soft token in one value (light); reused on dark
+     so cards still read as lifted paper against the espresso canvas. */
+  --shadow-edge-soft: 4px 5px 0 rgba(43, 35, 32, 0.13);
+  --shadow-edge-soft-hover: 5px 7px 0 rgba(43, 35, 32, 0.16);
+
+  /* Semantic stay constant across modes (DESIGN.md: "both modes"). */
+  --success: #5a6a48;
+  --warning: #a8741e;
+  --error: #8a2a1e;
+  --info: #4a5a6a;
+}
+
+/* ===========================================================================
+   OS-LEVEL DARK MODE  —  applies dark values to :root for standalone viewing.
+   A [data-theme] wrapper always overrides this (authored later, same spec).
+   =========================================================================== */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --ovl-tint: rgba(34, 26, 21, 0.70);         /* warm espresso glass, tied to #221b17 */
+    --ovl-edge: rgba(255, 248, 240, 0.16);
+    --ovl-ink: #f1eae0;                         /* warm off-white primary */
+    --ovl-ink-2: #c4b5a7;
+    --ovl-ink-3: #8e7f72;
+    --ovl-divider: rgba(240, 233, 224, 0.12);
+    --ovl-rule: rgba(240, 233, 224, 0.40);
+    --ovl-save-edge: rgba(240, 233, 224, 0.30);
+    --ovl-active-fg: #f6efe6;                   /* picker active-row text (warm, dark) — XS-2 */
+    --ovl-active-bg: rgba(240, 233, 224, 0.12); /* picker active-row fill (dark) */
+    --ovl-accent: #e6c49b;                      /* warm latte accent = --app-primary (dark) */
+
+    --app-canvas: #221b17;
+    --app-card: #2c241f;
+    --app-titlebar: #1c1611;
+    --app-ink: #f0e9e0;
+    --app-ink-2: #c3b4a6;
+    --app-ink-3: #8d7e71;
+    --app-line: #3a302a;
+    --app-primary: #e6c49b;
+    --app-primary-fg: #2b1f18;
+    --app-chip: rgba(230, 196, 155, 0.16);
+    --app-chip-fg: #e6c49b;
+    --app-primary-soft: rgba(230, 196, 155, 0.18);
+
+    --app-edge: #100c0a;
+    --shadow-edge: 3px 3px 0 var(--app-edge);
+    --shadow-edge-sm: 2px 2px 0 var(--app-edge);
+    --shadow-edge-press: 1px 1px 0 var(--app-edge);
+    --shadow-edge-soft: 4px 5px 0 rgba(43, 35, 32, 0.13);
+    --shadow-edge-soft-hover: 5px 7px 0 rgba(43, 35, 32, 0.16);
+  }
+}

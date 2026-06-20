@@ -1,0 +1,287 @@
+{
+  "note": "Server-authoritative BCP-47 canonicalization + the generation allowlist + the explanation-language set. canonicalize.expected === null means the tag is rejected.",
+  "canonicalize": [
+    {
+      "in": "zh-hans",
+      "expected": "zh-Hans",
+      "note": "script subtag titlecased; disambiguates zh-Hans vs zh-Hant"
+    },
+    {
+      "in": "EN",
+      "expected": "en",
+      "note": "language subtag lowercased"
+    },
+    {
+      "in": "en-us",
+      "expected": "en-US",
+      "note": "region uppercased"
+    },
+    {
+      "in": "EN-gb",
+      "expected": "en-GB"
+    },
+    {
+      "in": "zh-Hant",
+      "expected": "zh-Hant",
+      "note": "traditional stays distinct from zh-Hans"
+    },
+    {
+      "in": "zh-Hans-CN",
+      "expected": "zh-Hans-CN"
+    },
+    {
+      "in": "es",
+      "expected": "es"
+    },
+    {
+      "in": "fr-FR",
+      "expected": "fr-FR"
+    },
+    {
+      "in": "  en  ",
+      "expected": "en",
+      "note": "trimmed"
+    },
+    {
+      "in": "",
+      "expected": null,
+      "note": "empty rejected"
+    },
+    {
+      "in": "not a tag",
+      "expected": null,
+      "note": "structurally invalid (space) rejected"
+    },
+    {
+      "in": "x-private",
+      "expected": null,
+      "note": "pure private-use rejected (no stable key anchor)"
+    },
+    {
+      "in": "Hans",
+      "expected": null,
+      "note": "script-only (no language subtag) rejected"
+    }
+  ],
+  "generationAllowed": [
+    {
+      "in": "en",
+      "expected": true
+    },
+    {
+      "in": "en-US",
+      "expected": true,
+      "note": "matched by primary subtag"
+    },
+    {
+      "in": "EN",
+      "expected": true
+    },
+    {
+      "in": "en-x-evil",
+      "expected": false,
+      "note": "extension/private-use singleton rejected for generation"
+    },
+    {
+      "in": "zh-Hans",
+      "expected": true,
+      "note": "enabled by the D5 zh eval gate (PR #130) — generates alongside en"
+    },
+    {
+      "in": "ja",
+      "expected": true,
+      "note": "enabled by the ja eval gate (2026-06-18) — generates alongside en + zh-Hans"
+    },
+    {
+      "in": "es",
+      "expected": false
+    },
+    {
+      "in": "fr",
+      "expected": false
+    },
+    {
+      "in": "garbage tag",
+      "expected": false
+    }
+  ],
+  "generationCacheKey": [
+    {
+      "in": "en",
+      "expected": "en"
+    },
+    {
+      "in": "en-US",
+      "expected": "en",
+      "note": "collapses to a finite key so the shared cache keyspace stays bounded"
+    },
+    {
+      "in": "en-GB",
+      "expected": "en"
+    },
+    {
+      "in": "zh-Hans",
+      "expected": "zh-Hans",
+      "note": "profile ENABLED by the D5 zh eval gate (PR #130)"
+    }
+  ],
+  "targetProfile": [
+    {
+      "in": "en",
+      "expected": "en"
+    },
+    {
+      "in": "en-US",
+      "expected": "en",
+      "note": "region collapses to the profile tag"
+    },
+    {
+      "in": "EN-gb",
+      "expected": "en",
+      "note": "canonicalized before resolution"
+    },
+    {
+      "in": "en-Cyrl",
+      "expected": "en",
+      "note": "no en-Cyrl profile; falls through to the bare-language profile (today's collapse)"
+    },
+    {
+      "in": "zh-Hans",
+      "expected": "zh-Hans"
+    },
+    {
+      "in": "zh",
+      "expected": "zh-Hans",
+      "note": "bare zh maximizes to zh-Hans (CLDR likely subtags)"
+    },
+    {
+      "in": "zh-CN",
+      "expected": "zh-Hans"
+    },
+    {
+      "in": "zh-SG",
+      "expected": "zh-Hans"
+    },
+    {
+      "in": "zh-Hans-CN",
+      "expected": "zh-Hans"
+    },
+    {
+      "in": "zh-Hant",
+      "expected": null,
+      "note": "no zh-Hant profile and NO bare-zh profile — the script axis can never collapse"
+    },
+    {
+      "in": "zh-TW",
+      "expected": null,
+      "note": "maximizes to zh-Hant-TW; same null as zh-Hant"
+    },
+    {
+      "in": "ja",
+      "expected": "ja",
+      "note": "ja profile ENABLED by its eval gate (2026-06-18)"
+    },
+    {
+      "in": "en-x-evil",
+      "expected": null,
+      "note": "extension/private-use singleton rejected"
+    },
+    {
+      "in": "garbage tag",
+      "expected": null
+    }
+  ],
+  "explanationLanguage": [
+    {
+      "in": "en",
+      "expected": true
+    },
+    {
+      "in": "zh-Hans",
+      "expected": true
+    },
+    {
+      "in": "zh-hans",
+      "expected": true,
+      "note": "canonicalized before matching"
+    },
+    {
+      "in": "es",
+      "expected": true
+    },
+    {
+      "in": "de",
+      "expected": true
+    },
+    {
+      "in": "it",
+      "expected": true
+    },
+    {
+      "in": "fr",
+      "expected": true
+    },
+    {
+      "in": "pt",
+      "expected": true
+    },
+    {
+      "in": "ja",
+      "expected": true
+    },
+    {
+      "in": "ko",
+      "expected": true
+    },
+    {
+      "in": "en-US",
+      "expected": true,
+      "note": "resolves to en via likely-subtags"
+    },
+    {
+      "in": "es-MX",
+      "expected": true,
+      "note": "resolves to es"
+    },
+    {
+      "in": "pt-BR",
+      "expected": true,
+      "note": "resolves to pt"
+    },
+    {
+      "in": "de-AT",
+      "expected": true,
+      "note": "resolves to de"
+    },
+    {
+      "in": "ja-JP",
+      "expected": true,
+      "note": "resolves to ja"
+    },
+    {
+      "in": "zh-CN",
+      "expected": true,
+      "note": "resolves to zh-Hans"
+    },
+    {
+      "in": "zh",
+      "expected": true,
+      "note": "bare zh maximizes to zh-Hans (Simplified default)"
+    },
+    {
+      "in": "zh-TW",
+      "expected": false,
+      "note": "Traditional (zh-Hant) not supported at MVP"
+    },
+    {
+      "in": "ru",
+      "expected": false,
+      "note": "not in the explanation-language set"
+    },
+    {
+      "in": "ar",
+      "expected": false,
+      "note": "not in the explanation-language set"
+    }
+  ]
+}

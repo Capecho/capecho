@@ -1,0 +1,11 @@
+packages:
+  - backend
+  - clients/*
+  - shared/*
+  - web
+
+# web (Next.js marketing site) ships native deps that run install scripts;
+# keep them out of the approved-builds prompt — the site doesn't need them built.
+ignoredBuiltDependencies:
+  - sharp
+  - unrs-resolver

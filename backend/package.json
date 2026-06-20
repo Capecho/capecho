@@ -1,0 +1,32 @@
+{
+  "name": "@capecho/backend",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Capecho Cloudflare Workers backend — D1 (source of truth), R2 explanation cache, Durable Objects for single-flight + global budget.",
+  "scripts": {
+    "dev": "wrangler dev",
+    "test": "bun test",
+    "test:integration": "vitest run",
+    "typecheck": "tsc --noEmit",
+    "migrate:local": "wrangler d1 migrations apply capecho --local",
+    "migrate:remote": "wrangler d1 migrations apply capecho --remote",
+    "deploy": "wrangler deploy",
+    "deploy:staging": "wrangler deploy --env staging",
+    "migrate:staging": "wrangler d1 migrations apply capecho-staging --remote --env staging",
+    "tail:staging": "wrangler tail --env staging"
+  },
+  "dependencies": {
+    "@ai-sdk/google": "^3.0.80",
+    "@capecho/lang": "workspace:*",
+    "ai": "^6.0.193",
+    "ts-fsrs": "5.4.1"
+  },
+  "devDependencies": {
+    "@cloudflare/vitest-pool-workers": "^0.16.10",
+    "@cloudflare/workers-types": "^4.20250501.0",
+    "typescript": "^5.6.0",
+    "vitest": "^4.1.7",
+    "wrangler": "^4.20.0"
+  }
+}

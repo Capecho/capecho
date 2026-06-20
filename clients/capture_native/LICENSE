@@ -1,0 +1,15 @@
+This package is part of Capecho and is source-available under the Functional
+Source License, Version 1.1, with an Apache 2.0 future license
+(FSL-1.1-Apache-2.0). See the LICENSE file at the repository root for the full
+text.
+
+    Capecho — a capture-first vocabulary memory tool
+    Copyright (C) 2026 Capecho
+
+    You may read, self-host, modify, and use the Software for any purpose
+    except a Competing Use, as defined in the License. Two years after each
+    release is made available, that release is additionally licensed under the
+    Apache License, Version 2.0.
+
+    THE SOFTWARE IS PROVIDED "AS IS" AND WITHOUT WARRANTIES OF ANY KIND. See
+    the LICENSE file at the repository root for the complete terms.

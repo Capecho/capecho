@@ -1,0 +1,21 @@
+name: capecho_capture_core
+description: >-
+  Capecho's platform-neutral capture RECONSTRUCTION core (pure Dart, no Flutter,
+  no platform APIs). A native adapter (macOS Vision today, Windows.Media.Ocr
+  later) does the platform-inherent work — global hotkey, screen capture, OCR,
+  visual-span detection, highlight-pixel detection — and hands this core a
+  platform-neutral [OcrSnapshot] (lines + boxes + cursor + optional visual span /
+  selection rect). This core does the shared reconstruction: cursor→token
+  targeting, visual-span sentence/context windowing, with geometric paragraph
+  reconstruction kept as a legacy fallback → a [CaptureResult].
+  Written ONCE and reused by every Flutter client (macOS, Windows, iOS, Android);
+  the Windows port swaps only the native adapter. Fully `dart test`-able with no
+  display or permission.
+publish_to: none
+version: 0.1.0
+
+environment:
+  sdk: ^3.4.0
+
+dev_dependencies:
+  test: ^1.24.0

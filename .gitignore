@@ -1,0 +1,73 @@
+# macOS
+.DS_Store
+
+# gstack tooling state / browse logs (local only)
+.gstack/
+
+# spike build output
+spikes
+
+# Node / backend (Cloudflare Workers)
+node_modules/
+dist/
+.wrangler/
+*.log
+.dev.vars
+# eval artifacts (regenerable; preview-overlay-samples.ts / paid runs write here)
+backend/eval/out/
+
+# OAuth provider credential downloads (Google/Apple consoles) — NEVER commit these.
+# (Our ID-token-verification flow needs only GOOGLE_CLIENT_ID / APPLE_CLIENT_ID, set as
+#  Worker secrets/vars; the downloaded client_secret file is not used by the backend.)
+client_secret*.json
+*.apps.googleusercontent.com.json
+
+# Research corpus — raw Reddit thread JSON (bulky primary data, kept local).
+# The derived analysis (competitors.md, market-research.md) IS committed.
+docs/research/sources/
+
+# App Store Connect API key (.p8) for notarization (scripts/macos/notarize.sh) — NEVER commit.
+*.p8
+AuthKey_*.p8
+
+# Provisioning profiles (build-env artifacts; keep them out of the repo).
+*.provisionprofile
+*.mobileprovision
+
+# Local release secrets sourced by the macOS release scripts (DEVELOPER_ID_APP, AC_API_*, …).
+release.env
+scripts/macos/release.env
+
+# Flutter / Dart clients
+.dart_tool/
+.flutter-plugins
+.flutter-plugins-dependencies
+**/build/
+/build/
+.packages
+pubspec_overrides.yaml
+# library packages don't pin pubspec.lock (app packages under clients/ may, later)
+shared/**/pubspec.lock
+
+# Rust / WASM (shared normalization core)
+/target/
+**/target/
+pkg/
+
+# Xcode (macOS native capture module)
+*.xcuserstate
+**/xcuserdata/
+DerivedData/
+# A built/exported macOS .app landing in the source tree (a build product — never tracked; the real
+# build output lives under build/, already ignored above).
+clients/macos/macos/*.app/
+
+# SwiftPM build artifacts (e.g. shared/design-tokens, plugin `swift build`)
+.build/
+**/.build/
+
+.agents
+# Local Claude state stays ignored, but the shared SessionStart hook + project settings are committed.
+.claude/*
+!.claude/settings.json
+!.claude/hooks

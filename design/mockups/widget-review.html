@@ -1,0 +1,179 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Capecho — review widget mockup</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,600;1,9..144,500&family=JetBrains+Mono:wght@500&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --canvas: #f6f3ef; --card: #ffffff; --ink: #2b2320; --ink-2: #6b5d54; --ink-3: #a2958a;
+        --primary: #644a40; --chip: #ffdfb5; --oxblood: #8a2a1e; --sage: #5a6a48;
+        --ochre: #a8741e; --slate: #4a5a6a;
+        --font-display: "Fraunces", Georgia, serif;
+        --font-body: "Charter", "Source Serif 4", Georgia, serif;
+        --font-mono: "JetBrains Mono", ui-monospace, monospace;
+      }
+      .dark {
+        --canvas: #221b17; --card: #2c241f; --ink: #f0e9e0; --ink-2: #c3b4a6; --ink-3: #8d7e71;
+        --primary: #e6c49b; --chip: #4a3a2e; --oxblood: #d98a72; --sage: #a9bd86;
+      }
+      * { box-sizing: border-box; margin: 0; }
+      body { background: #e7e2db; font-family: var(--font-body); padding: 40px; display: flex;
+        flex-wrap: wrap; gap: 40px; align-items: flex-start; color: #3a322c; }
+      .stack { display: flex; flex-direction: column; gap: 10px; }
+      .label { font: 600 12px/1 var(--font-mono); letter-spacing: 0.04em; color: #6b5d54; text-transform: uppercase; }
+      .w { width: 360px; background: var(--canvas); color: var(--ink); border-radius: 24px;
+        padding: 18px 20px; box-shadow: 0 1px 2px rgba(43,35,32,.06), 0 8px 24px rgba(43,35,32,.1);
+        display: flex; flex-direction: column; position: relative; overflow: hidden; }
+      .medium { height: 230px; }
+      .large { height: 470px; }
+
+      /* Fixed header: unit + "x due" pinned top-right on ONE row; the word never changes
+         size (front/back, medium/large). The reading sits on its OWN line beneath — a long
+         unit AND a long reading each get a full row instead of fighting for one. */
+      .head { display: flex; align-items: baseline; gap: 7px; min-height: 28px; }
+      .word { font-family: var(--font-display); color: var(--primary); font-weight: 600;
+        font-size: 24px; line-height: 1.1; flex: 0 1 auto; min-width: 0;
+        overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+      .pos { font-family: var(--font-body); font-style: italic; font-size: 13px; color: var(--ink-3);
+        flex: none; white-space: nowrap; }
+      .reading { font: 500 12px/1.3 var(--font-mono); color: var(--ink-3); margin-top: 3px; }
+      .due { display: flex; align-items: center; gap: 6px; color: var(--primary);
+        margin-left: auto; flex: none; align-self: center; }
+      .due .echo { width: 16px; height: 16px; }
+      .due .n { font: 500 12px/1 var(--font-mono); color: var(--ink-3); }
+
+      /* front: context sentence — guaranteed line space */
+      .sentence { font-family: var(--font-body); color: var(--ink-2); line-height: 1.5; margin-top: 10px; font-size: 15px; }
+      .sentence b { color: var(--primary); font-weight: 600; background: var(--chip); border-radius: 4px; padding: 0 3px; }
+      .medium .sentence { min-height: calc(15px * 1.5 * 5); } /* >= 5 lines */
+      .large .sentence { font-size: 16px; min-height: calc(16px * 1.5 * 11); } /* >= 11 lines */
+      /* back: meaning = primary answer */
+      .meaning { font-family: var(--font-body); color: var(--ink); margin-top: 10px; font-size: 16px; line-height: 1.45; }
+      .medium .meaning { font-size: 15px; min-height: calc(15px * 1.45 * 3); } /* >= 3 lines */
+      .large .meaning { font-size: 16px; min-height: calc(16px * 1.45 * 6); } /* >= 6 lines */
+      /* back: example = clearly secondary (latte bar + italic ink-3) */
+      .example { margin-top: 10px; display: flex; gap: 8px; }
+      .large .example .t { line-height: 1.5; font-size: 13px; }
+      .large .example { min-height: calc(13px * 1.5 * 6); } /* >= 6 lines context */
+      .example .bar { width: 3px; border-radius: 2px; background: var(--chip); flex: none; }
+      .example .t { font-family: var(--font-body); font-style: italic; color: var(--ink-3); font-size: 14px; line-height: 1.4; }
+      .example .t b { color: var(--primary); font-style: normal; background: var(--chip); border-radius: 4px; padding: 0 3px; }
+      .reveal { margin-top: auto; font: 500 13px/1 -apple-system, system-ui, sans-serif; color: var(--ink-3); display: flex; align-items: center; gap: 6px; }
+      .reveal::before { content: ""; width: 5px; height: 5px; border-radius: 50%; background: var(--ink-3); }
+      .row { margin-top: auto; display: flex; gap: 10px; padding-top: 12px; }
+      .btn { flex: 1; text-align: center; font: 600 13px/1 -apple-system, system-ui, sans-serif; padding: 10px 0; border-radius: 12px; border: 1.5px solid; background: transparent; }
+      .forget { color: var(--oxblood); border-color: color-mix(in srgb, var(--oxblood) 45%, transparent); }
+      .good { color: var(--sage); border-color: color-mix(in srgb, var(--sage) 50%, transparent); }
+      .hard { color: var(--ochre); border-color: color-mix(in srgb, var(--ochre) 45%, transparent); }
+      .easy { color: var(--slate); border-color: color-mix(in srgb, var(--slate) 45%, transparent); }
+      .empty { align-items: center; justify-content: center; text-align: center; gap: 10px; }
+      .empty .echo { width: 30px; height: 30px; color: var(--ink-3); opacity: .5; }
+      .empty .t { font-family: var(--font-display); font-size: 18px; color: var(--ink-2); }
+      .empty .s { font: 500 13px/1.4 -apple-system, system-ui, sans-serif; color: var(--ink-3); }
+      .inkdot { position: absolute; top: 18px; right: 20px; width: 6px; height: 6px; border-radius: 50%; background: var(--primary); }
+    </style>
+  </head>
+  <body>
+    <svg width="0" height="0" style="position:absolute">
+      <symbol id="echo" viewBox="0 0 28 28" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round">
+        <g transform="translate(-3.08 -3.5) scale(1.25)">
+          <path d="M10.5 13 a 2.3 2.3 0 0 1 0 -4" transform="translate(-2.2 3)" />
+          <path d="M15.5 14.7 a 5 4.1 0 0 1 0 -7.4" transform="translate(-1.7 3)" />
+          <path d="M21 15.7 a 6.5 5.0 0 0 1 0 -9.4" transform="translate(-0.8 3)" />
+        </g>
+      </symbol>
+    </svg>
+
+    <div class="stack">
+      <div class="label">Medium · front (light)</div>
+      <div class="w medium">
+        <div class="head">
+          <span class="word">ledger</span>
+          <span class="pos">noun</span>
+          <div class="due"><svg class="echo"><use href="#echo" /></svg><span class="n">7 due</span></div>
+        </div>
+        <div class="reading">/ˈlɛdʒər/</div>
+        <div class="sentence">She kept a meticulous <b>ledger</b> of every debt and favour, settling each account at the close of the long, lamplit accounting season before the auditors arrived.</div>
+      </div>
+    </div>
+
+    <div class="stack">
+      <div class="label">Medium · back (light) — meaning only</div>
+      <div class="w medium back">
+        <div class="head">
+          <span class="word">ledger</span>
+          <span class="pos">noun</span>
+          <div class="due"><svg class="echo"><use href="#echo" /></svg><span class="n">7 due</span></div>
+        </div>
+        <div class="reading">/ˈlɛdʒər/</div>
+        <div class="meaning">账簿;分类账 — a book in which a business records its financial accounts, with every debit and credit entered by hand.</div>
+        <div class="row"><div class="btn forget">Forget</div><div class="btn good">Good</div></div>
+      </div>
+    </div>
+
+    <div class="stack">
+      <div class="label">Medium · back (espresso dark)</div>
+      <div class="w medium back dark">
+        <span class="inkdot"></span>
+        <div class="head">
+          <span class="word">serendipity</span>
+          <span class="pos">noun</span>
+          <div class="due"><svg class="echo"><use href="#echo" /></svg><span class="n">6 due</span></div>
+        </div>
+        <div class="reading">/ˌsɛrənˈdɪpɪti/</div>
+        <div class="meaning">意外发现珍宝的运气 — the knack of stumbling onto something fortunate exactly when you weren't looking for it.</div>
+        <div class="row"><div class="btn forget">Forget</div><div class="btn good">Good</div></div>
+      </div>
+    </div>
+
+    <div class="stack">
+      <div class="label">Large · front — context (≥ 11 lines)</div>
+      <div class="w large">
+        <div class="head">
+          <span class="word">ledger</span>
+          <span class="pos">noun</span>
+          <div class="due"><svg class="echo"><use href="#echo" /></svg><span class="n">12 due</span></div>
+        </div>
+        <div class="reading">/ˈlɛdʒər/</div>
+        <div class="sentence">She kept a meticulous <b>ledger</b> of every debt and favour, settling each account at the close of the long, lamplit accounting season before the auditors arrived in spring to weigh her figures against the till, and not a single farthing — borrowed, lent, or quietly forgiven over the years — ever slipped past the ruled columns of her patient, unforgiving hand.</div>
+      </div>
+    </div>
+
+    <div class="stack">
+      <div class="label">Large · back — meaning (primary) vs. example (secondary)</div>
+      <div class="w large back">
+        <div class="head">
+          <span class="word">ledger</span>
+          <span class="pos">noun</span>
+          <div class="due"><svg class="echo"><use href="#echo" /></svg><span class="n">12 due</span></div>
+        </div>
+        <div class="reading">/ˈlɛdʒər/</div>
+        <div class="meaning">账簿;分类账 — a book in which a business records its financial accounts, every debit and credit entered by hand so that, at any moment, the running balance of what is owed and owned can be read off at a glance.</div>
+        <div class="example">
+          <div class="bar"></div>
+          <div class="t">She kept a meticulous <b>ledger</b> of every debt and favour, settling each account at the close of the long, lamplit accounting season before the auditors arrived in spring to weigh her figures against the till.</div>
+        </div>
+        <div class="row">
+          <div class="btn forget">Forget</div><div class="btn hard">Hard</div>
+          <div class="btn good">Good</div><div class="btn easy">Easy</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="stack">
+      <div class="label">All caught up (light)</div>
+      <div class="w medium empty">
+        <svg class="echo"><use href="#echo" /></svg>
+        <div class="t">All caught up</div>
+        <div class="s">Nothing due right now — captured words are settling in.</div>
+      </div>
+    </div>
+  </body>
+</html>

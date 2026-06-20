@@ -1,0 +1,1 @@
+../../../capture_native/Sources/capture_native/Logic/CaptureSelectionPromotion.swift

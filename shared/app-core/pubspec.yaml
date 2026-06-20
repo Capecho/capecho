@@ -1,0 +1,68 @@
+name: capecho_app_core
+description: >-
+  Shared Flutter app core for Capecho's clients (macOS + mobile): the platform-agnostic controllers
+  (auth, review), the shared sign-in panel, the warm design system (palette, echo mark, buttons,
+  surface header), and the HTTP transport. Both clients build on ONE implementation so the auth +
+  review logic can't drift. Platform-specific pieces (token storage, capture, navigation chrome, the
+  native sign-in client ids) stay in each client and are injected.
+publish_to: 'none'
+version: 0.1.0
+
+environment:
+  sdk: ^3.12.0
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  # The typed backend client every controller drives (auth, words, review, sync, explain, claim).
+  capecho_api:
+    path: ../api-client
+
+  # The Word Book controller reads the local store's row types for the signed-out catalog adapter
+  # (LocalWordBook). Pure Dart; mobile passes local: null and never opens a store, so no native sqlite.
+  capecho_local_store:
+    path: ../local-store
+
+  # The concrete network impl behind capecho_api's injected HttpTransport (HttpClientTransport).
+  http: ^1.2.0
+
+  # Native Apple + Google sign-in, wrapped in social_credentials.dart (the one place touching the
+  # plugins). Both ship Swift Package Manager + Android support, so they resolve on macOS and mobile
+  # alike; the per-build OAuth client ids are passed in by each client, never hard-coded here.
+  sign_in_with_apple: ^8.0.0
+  google_sign_in: ^7.2.0
+
+  # Renders the provider brand glyphs (Apple · multi-color Google · email) from inline SVG in the
+  # sign-in panel — pure Dart, no native plugin.
+  flutter_svg: ^2.0.0
+
+  # Pro subscription (Apple-IAP rail, shared by iOS + macOS): the App Store in-app-purchase plugin.
+  # `in_app_purchase` pulls `in_app_purchase_storekit` (StoreKit, iOS + macOS) and, on mobile,
+  # `in_app_purchase_android`. The storekit package ships a Swift Package Manager manifest and declares
+  # macOS support (`sharedDarwinSource`), so it resolves through Flutter's generated SPM package and keeps
+  # the macOS client CocoaPods-free (same rule as the sign-in / about plugins above); the Android impl is
+  # platform-gated and simply isn't built on macOS.
+  in_app_purchase: ^3.2.0
+
+  # Settings → About: read the running app's version from the bundle (package_info_plus) and open the
+  # legal/contact links (url_launcher). Both ship Swift Package Manager support, so they resolve through
+  # Flutter's generated SPM package and keep the macOS client CocoaPods-free (same rule as the sign-in
+  # plugins above).
+  package_info_plus: ^8.0.0
+  url_launcher: ^6.3.0
+
+  # Word Book → Export: assemble the one-click Anki `.apkg` deck on-device (AnkiDeckBuilder). The deck is
+  # a ZIP of a SQLite `collection.anki2` (schema v11) + a `media` map. Shared so BOTH clients build the
+  # same deck (macOS save panel + mobile share sheet). `sqlite3` v3+ loads SQLite via Dart native-assets
+  # (build hooks) — SwiftPM-pure, no CocoaPods, so macOS stays clean; mobile bundles the device library
+  # via `sqlite3_flutter_libs` in its own pubspec. `archive` (pure-Dart zip) packages the deck; `crypto`
+  # computes the Anki note checksum (SHA-1) so Anki's duplicate-finder works on import.
+  sqlite3: ^3.3.2
+  archive: ^4.0.9
+  crypto: ^3.0.7
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^6.0.0

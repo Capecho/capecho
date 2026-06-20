@@ -1,0 +1,32 @@
+// Version inheritance for the CapechoReviewWidgetExtension target.
+//
+// App Store / TestFlight reject an .appex whose CFBundleVersion / CFBundleShortVersionString don't match
+// the containing Runner app. Runner derives both from FLUTTER_BUILD_NUMBER / FLUTTER_BUILD_NAME, which
+// Flutter regenerates into Generated.xcconfig from pubspec's `version:` on every build. Including that
+// file here lets the widget track the exact same values automatically — one source of truth, no second
+// place to bump on release. (project.pbxproj sets the extension's CURRENT_PROJECT_VERSION /
+// MARKETING_VERSION to those vars; with GENERATE_INFOPLIST_FILE = YES that's what feeds the bundle
+// version keys.)
+//
+// FLUTTER_TARGET points at the app's Dart entrypoint and is meaningless for a target with no Flutter
+// build phase — cleared for hygiene.
+//
+// CONFIGURATION_BUILD_DIR: deliberately NOT overridden here, so it resolves to exactly the SAME value
+// Runner uses — whatever `flutter build` writes into Generated.xcconfig for this run (the flat
+// build/ios/iphoneos during a device build), or Xcode's default when that line is absent. The point is
+// that the extension stays in lockstep with Runner. Verified empirically: pinning the extension's
+// CONFIGURATION_BUILD_DIR to a value that DIFFERS from Runner's (e.g. Xcode's per-config default
+// $(BUILD_DIR)/$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)) makes Xcode revert BOTH targets to the
+// BUILD_DIR-relative path, moving Runner.app out of build/ios/iphoneos and breaking `flutter
+// build`/`flutter run` ("expected app ... not found"). Setting it empty breaks the build outright (the
+// extension can't resolve its WidgetReviewKit module). Matching Runner is the safe state: the extension
+// is treated identically to the app — Runner's archive path (scripts/ios/build_release.sh) is already
+// known-good with this same (un-overridden) setting, so the .appex embeds into Runner.app/PlugIns and
+// archives the same way.
+//
+// Everything else Generated.xcconfig defines (EXCLUDED_ARCHS, DART_DEFINES, etc.) is inert for a pure
+// SwiftUI widget extension. Keep this repo CocoaPods-free: this is a plain Flutter-generated include,
+// no Pods xcconfig.
+#include "Generated.xcconfig"
+
+FLUTTER_TARGET =

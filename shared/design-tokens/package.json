@@ -1,0 +1,13 @@
+{
+  "name": "@capecho/design-tokens",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Generate platform design tokens (Dart + Swift + JSON) from design/tokens.css, with a CI drift gate (DES-2).",
+  "scripts": {
+    "generate": "bun run src/generate.ts",
+    "check": "bun run src/generate.ts --check",
+    "test": "bun test",
+    "typecheck": "tsc --noEmit"
+  }
+}

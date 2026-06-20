@@ -1,0 +1,17 @@
+# Analyzer + formatter for capecho_local_store (pure Dart). `dart format` and CI read page_width
+# from here.
+formatter:
+  page_width: 100
+
+linter:
+  rules:
+    # High-value conventions, kept enforced (the same set as the Flutter packages).
+    - prefer_single_quotes
+    - directives_ordering
+    - prefer_const_constructors
+    - prefer_const_constructors_in_immutables
+    - prefer_const_literals_to_create_immutables
+    - prefer_const_declarations
+    - use_super_parameters
+    - unnecessary_parenthesis
+    - unawaited_futures

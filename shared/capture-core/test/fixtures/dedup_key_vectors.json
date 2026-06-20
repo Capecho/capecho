@@ -1,0 +1,21 @@
+{
+  "_comment": "Shared DEDUP-KEY parity vectors (T21 2026-06-03). The server TS `dedupKey` (backend/src/dedup-key.ts, dedup-key.test.ts) AND the macOS client `localDedupKey` (clients/macos/lib/capture_repository.dart, local_dedup_key_test.dart) BOTH assert against these, so the two hand-ported deterministic normalizers can't silently drift the offline dedup key from the server one. Cases are NFC-STABLE on purpose: NFC is the ONE step the client omits (Dart has no native NFC; the server applies it + re-keys authoritatively on sync), so a combining-mark case would legitimately differ between the ports and does NOT belong here. Each case: dedupKey(in) === out. NOT a lemmatizer — `saw`/`studied` stay distinct from `see`/`study`.",
+  "cases": [
+    { "in": "study", "out": "study" },
+    { "in": "Study", "out": "study" },
+    { "in": "STUDY", "out": "study" },
+    { "in": "study.", "out": "study" },
+    { "in": "  study  ", "out": "study" },
+    { "in": "out  of   the blue", "out": "out of the blue" },
+    { "in": "saw", "out": "saw" },
+    { "in": "see", "out": "see" },
+    { "in": "studied", "out": "studied" },
+    { "in": "¡Hola!", "out": "hola" },
+    { "in": "«mot»", "out": "mot" },
+    { "in": "groß", "out": "groß" },
+    { "in": "covid19", "out": "covid19" },
+    { "in": "word2", "out": "word2" },
+    { "in": "...", "out": "" },
+    { "in": "   ", "out": "" }
+  ]
+}

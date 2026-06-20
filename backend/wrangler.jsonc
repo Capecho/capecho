@@ -1,0 +1,155 @@
+{
+	"$schema": "node_modules/wrangler/config-schema.json",
+	"name": "capecho-backend",
+	"main": "src/index.ts",
+	"compatibility_date": "2026-05-01",
+	"observability": {
+		"enabled": true
+	},
+	"d1_databases": [
+		{
+			"binding": "DB",
+			"database_name": "capecho",
+			"database_id": "YOUR_D1_DATABASE_ID",
+			"migrations_dir": "migrations"
+		}
+	],
+	// Shared public explanation cache (R2 + CDN). Provision with:
+	// `wrangler r2 bucket create capecho-explanations`.
+	"r2_buckets": [
+		{
+			"binding": "EXPLANATION_CACHE",
+			"bucket_name": "capecho-explanations"
+		}
+	],
+	// Durable Objects: single-flight coalescing on cache-miss + the global daily
+	// AI-spend cap (fail-closed). Per ENG-2, the per-user context quota is NOT a DO
+	// — it lives in the D1 context_quota_reservations table.
+	"durable_objects": {
+		"bindings": [
+			{
+				"name": "GLOBAL_BUDGET",
+				"class_name": "GlobalBudget"
+			},
+			{
+				"name": "SINGLE_FLIGHT",
+				"class_name": "SingleFlight"
+			}
+		]
+	},
+	"migrations": [
+		{
+			"tag": "v1",
+			"new_sqlite_classes": [
+				"GlobalBudget",
+				"SingleFlight"
+			]
+		}
+	],
+	// Cost-spine overrides (defaults live in src/config.ts). Free word/phrase lookup is
+	// open to everyone: anonymous (signed-out) callers are always served cache HITS, and
+	// this opens the documented small bounded allowance for the cache-MISS path that needs
+	// AI generation. Generation for account-less callers is gated because the anon device
+	// id is client-asserted + forgeable (budget-DoS guard, US-3.1); the allowance is ONE
+	// GLOBAL daily sub-cap shared across all anon callers (DO key `anon:<utc-day>`), well
+	// below GLOBAL_DAILY_BUDGET_UNITS (default 5000), so a forged-id flood still can't drain
+	// the main budget. Only the paid context layer (`/explain/context/preview`, US-3.2)
+	// requires an account. Tune/disable per deployment; 0 = closed (HIT-only) again.
+	// Free saved-word cap N — a capacity tier (NOT punitive). DISABLED for the MVP: saving is free and
+	// unlimited so the corpus + habit accumulate; the only metered lever is per-use AI generation. `0` ⇒
+	// no cap (overrides src/config.ts DEFAULT_FREE_WORD_CAP). The enforcement path is retained — set a
+	// positive value to re-enable. See docs/product-definition-frontier.md §9.
+	"vars": {
+		"ANON_DAILY_GENERATION_UNITS": "500",
+		"FREE_WORD_CAP": "0",
+		// The "Capecho Pro" prices. Each may be a Stripe Price id (price_…) OR a lookup_key (a readable alias
+		// set on the Price); the checkout resolves a lookup_key → its current active Price id (so changing the
+		// amount = re-pointing the key in Stripe, no redeploy). NOTE the annual var is `_ANNUAL`, not `_YEARLY`.
+		"STRIPE_PRICE_ID_MONTHLY": "YOUR_STRIPE_PRICE_ID",
+		"STRIPE_PRICE_ID_ANNUAL": "YOUR_STRIPE_PRICE_ID"
+	},
+	// Billing — Stripe rail. SECRETS (never here — set via `wrangler secret put`):
+	//   STRIPE_WEBHOOK_SECRET  (whsec_…)  — verifies POST /billing/stripe/webhook; unset ⇒ webhook 503s.
+	//   STRIPE_SECRET_KEY      (sk_…)     — Bearer for the Checkout buy path; unset ⇒ checkout 503s.
+	// Optional: STRIPE_SUCCESS_URL / STRIPE_CANCEL_URL (post-checkout redirects; sane defaults if unset).
+	//
+	// Billing — Apple IAP rail (App Store Server API authority; no x5c verification on Workers).
+	//   SECRET: APPLE_IAP_PRIVATE_KEY (.p8 PEM; `wrangler secret put`).
+	//   VARS (add to "vars" above once known): APPLE_IAP_KEY_ID, APPLE_IAP_ISSUER_ID, APPLE_IAP_BUNDLE_ID,
+	//   and APPLE_ENVIRONMENT ("Production" default | "Sandbox" for a staging box). Any required piece
+	//   missing ⇒ the Apple routes 503. APPLE_ENVIRONMENT gates which env's triggers are honored, so a
+	//   sandbox notification can't grant production Pro.
+	// Scheduled maintenance (src/index.ts `scheduled()`): T8 retention purge of hard-deleted
+	// accounts + refund of expired quota reservations. Daily at 03:00 UTC; both jobs idempotent.
+	"triggers": {
+		"crons": [
+			"0 3 * * *"
+		]
+	},
+	// ── Staging ──────────────────────────────────────────────────────────────────────────────────
+	// An ISOLATED test box: its OWN Worker, D1, R2 cache, Durable Objects, secrets, and AI budget — so
+	// verifying a service change (the v3 cache rekey, billing webhooks, a new migration, on-device E2E)
+	// never touches prod data, the shared explanation cache, or the live budget. It deploys to the free
+	// `capecho-backend-staging.<account>.workers.dev` URL; a debug client points at it via
+	// `--dart-define CAPECHO_API_BASE=…` (no client code change). One-time provisioning + deploy:
+	// backend/README.md → "Staging".  (`/explain` GENERATION quality is evaluated separately, with no
+	// deploy, via `bun run eval:grounded`.)
+	//
+	// Wrangler named environments do NOT inherit binding / var / trigger keys, so each is re-declared
+	// here (only `main` / `compatibility_date` / `observability` inherit). Staging deliberately mirrors
+	// prod behaviour — no auth/provider mock flags are baked in; set any you want ad hoc per deploy.
+	"env": {
+		"staging": {
+			"workers_dev": true,
+			"d1_databases": [
+				{
+					"binding": "DB",
+					"database_name": "capecho-staging",
+					"database_id": "YOUR_D1_DATABASE_ID",
+					"migrations_dir": "migrations"
+				}
+			],
+			"r2_buckets": [
+				{
+					"binding": "EXPLANATION_CACHE",
+					"bucket_name": "capecho-explanations-staging"
+				}
+			],
+			"durable_objects": {
+				"bindings": [
+					{
+						"name": "GLOBAL_BUDGET",
+						"class_name": "GlobalBudget"
+					},
+					{
+						"name": "SINGLE_FLIGHT",
+						"class_name": "SingleFlight"
+					}
+				]
+			},
+			"migrations": [
+				{
+					"tag": "v1",
+					"new_sqlite_classes": [
+						"GlobalBudget",
+						"SingleFlight"
+					]
+				}
+			],
+			// Mirror prod's cost-spine vars. These are this env's Stripe TEST-mode price ids (product
+			// YOUR_STRIPE_PRODUCT_ID), resolvable only by the test-mode STRIPE_SECRET_KEY secret — so no live
+			// price can be charged here. Price ids aren't secret; the sk_test_… key is (wrangler secret put).
+			"vars": {
+				"ANON_DAILY_GENERATION_UNITS": "500",
+				"FREE_WORD_CAP": "0",
+				"STRIPE_PRICE_ID_MONTHLY": "YOUR_STRIPE_PRICE_ID",
+				"STRIPE_PRICE_ID_ANNUAL": "YOUR_STRIPE_PRICE_ID"
+			},
+			// No real users on staging → nothing for the retention/refund crons to purge. Leave them off
+			// (the cron path is still exercisable locally via `wrangler dev --test-scheduled`).
+			"triggers": {
+				"crons": []
+			}
+		}
+	}
+}
